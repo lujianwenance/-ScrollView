@@ -8,10 +8,17 @@
 
 #import <UIKit/UIKit.h>
 
+@protocol CircleScrollViewDelegate <NSObject>
+
+- (void)didSelectedCircleScrollViewAtIndex:(NSInteger)index;
+
+@end
+
 @interface CircleScrollView : UIView
 
-@property (nonatomic, strong) NSMutableArray *allDatas;
+@property (nonatomic, weak) id <CircleScrollViewDelegate > delegate;
 
+@property (nonatomic, strong) NSMutableArray *allDatas;
 @property (nonatomic, assign) CGFloat innerScrollWith;
 
 @end

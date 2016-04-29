@@ -80,6 +80,15 @@ static CGFloat kScrollViewWidth = 280.0;
     return _pageControl;
 }
 
+- (NSMutableArray *)showImages {
+
+    if (!_showImages) {
+        _showImages = [NSMutableArray array];
+    }
+    
+    return _showImages;
+}
+
 - (CGFloat)innerScrollWith {
     return _innerScrollWith ? : 280;
 }
@@ -116,9 +125,7 @@ static CGFloat kScrollViewWidth = 280.0;
 - (void)reloadData {
     
     self.pageControl.currentPage = self.currentPage;
-    
     [self.showImages makeObjectsPerformSelector:@selector(removeFromSuperview)];
-    
     [self getDisplayImagesWithCurpage:self.currentPage];
     
     for (int i = 0; i < kShowViewsCount; i++) {
@@ -138,9 +145,6 @@ static CGFloat kScrollViewWidth = 280.0;
     NSInteger next = [self validPageValue:self.currentPage + 1];
     NSInteger furtherNext = [self validPageValue:self.currentPage + 2];
     
-    if (!self.showImages) {
-        self.showImages = [NSMutableArray arrayWithCapacity:0];
-    }
     [self.showImages removeAllObjects];
     
     [self.showImages addObject:[self pageAtIndex:furtherPrev]];
@@ -167,12 +171,24 @@ static CGFloat kScrollViewWidth = 280.0;
 - (UIImageView *)pageAtIndex:(NSInteger)index {
     
     UIImageView *view = [[UIImageView alloc] initWithFrame:CGRectMake(0, 0, self.scrollView.width, self.scrollView.height)];
+    view.tag = index;
+    view.userInteractionEnabled = YES;
+    UITapGestureRecognizer *tap = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(didPressImageView:)];
+    [view addGestureRecognizer:tap];
     
     if (index >= 0 && index < self.allDatas.count) {
         view.image = [UIImage imageNamed:self.allDatas[index]];
     }
     
     return view;
+}
+
+- (void)didPressImageView:(UITapGestureRecognizer *)tap {
+    
+    UIImageView *imageView = (UIImageView *)tap.view;
+    if (self.delegate && [self.delegate respondsToSelector:@selector(didSelectedCircleScrollViewAtIndex:)]) {
+        [self.delegate didSelectedCircleScrollViewAtIndex:imageView.tag];
+    }
 }
 
 #pragma mark - UIScrollViewDelegate
